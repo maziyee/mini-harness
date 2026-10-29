@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Agent Harness 笔试说明",
+    "snippet": "从零实现最小 Agent：循环、工具注册、session、context、trace。",
+    "source": "internal",
+    "tags": ["agent", "harness", "笔试", "runtime"]
+  },
+  {
+    "title": "Anthropic 工具调用协议",
+    "snippet": "assistant 返回 tool_use content block，user 用 tool_result 回填。",
+    "source": "docs",
+    "tags": ["anthropic", "tool_use", "protocol", "function calling"]
+  },
+  {
+    "title": "Context 压缩策略",
+    "snippet": "先做工具结果预算，再做旧轮摘要；目标和约束永远保留。",
+    "source": "notes",
+    "tags": ["context", "compaction", "memory", "摘要"]
+  },
+  {
+    "title": "Session 隔离",
+    "snippet": "按 user 和 session 两级 key 存储，窗口之间互不影响。",
+    "source": "notes",
+    "tags": ["session", "isolation", "窗口"]
+  },
+  {
+    "title": "北京天气",
+    "snippet": "北京秋季干燥，昼夜温差较大。",
+    "source": "mock",
+    "tags": ["weather", "北京", "天气"]
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "_notes": [
+    "null / empty string means: fall back to environment variables or built-in defaults.",
+    "CLI arguments override this file; this file overrides .env/environment.",
+    "model: null means use ANTHROPIC_MODEL or the built-in default.",
+    "Set model to your provider's exact id, e.g. claude-sonnet-5-5 or deepseek-flash[1M].",
+    "config.json is gitignored. Do not commit real API keys."
+  ],
+  "llm": {
+    "api_key": "",
+    "auth_token": "",
+    "base_url": "",
+    "model": null,
+    "max_tokens": null,
+    "timeout": 60,
+    "max_retries": 3,
+    "thinking": null,
+    "thinking_budget": null,
+    "show_thinking": null,
+    "keep_thinking_in_memory": null
+  },
+  "agent": {
+    "max_steps": 8,
+    "max_turns": 20,
+    "context_window": 200000
+  },
+  "storage": {
+    "root": ""
+  }
+}

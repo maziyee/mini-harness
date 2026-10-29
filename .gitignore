@@ -1,0 +1,45 @@
+# secrets
+config.json
+.env
+.env.*
+!.env.example
+
+# internal planning docs (local only, not for submission)
+docs/PLAN.md
+docs/MATERIALS.md
+docs/SOURCE_MAP.md
+docs/READING_GUIDE.md
+docs/MEMORY_MAPPING.md
+docs/CONTEXT_DESIGN.md
+docs/PROMPT_DESIGN.md
+docs/TOOL_CALL_DESIGN.md
+qa/
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+
+# runtime data
+sessions/*
+!sessions/.gitkeep
+memory/*
+!memory/.gitkeep
+logs/
+artifacts/
+data/artifacts/
+data/sessions/
+data/logs/
+*.log
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/

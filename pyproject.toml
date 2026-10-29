@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mini-agent-harness"
+version = "0.1.0"
+description = "A minimal agent runtime for the 2026 Agent harness take-home"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "anthropic>=0.40",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.2",
+]
+
+[project.scripts]
+mini-agent = "mini_agent.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The system pytest 6.2 in this environment is incompatible with the
+# installed anyio plugin; the suite is synchronous, so disabling it is safe.
+addopts = "-q -p no:anyio"
