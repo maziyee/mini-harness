@@ -1,9 +1,9 @@
 """Model-callable long-term memory tool.
 
-The reference design lets the model decide what to remember (it writes
-Markdown memory files).  We keep that agency, but through a narrow tool
-instead of a general ``write_file``: save/search/list only, scoped to the
-current user.  The runtime's explicit-signal capture remains as a fallback.
+The model should decide what to remember.  We keep that agency, but
+through a narrow tool instead of a general ``write_file``: save/search/list
+only, scoped to the current user.  The runtime's explicit-signal capture
+remains as a fallback.
 """
 
 from __future__ import annotations

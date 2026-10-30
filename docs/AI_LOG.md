@@ -20,7 +20,7 @@
 | AI 做了什么 | 人做了什么 |
 |---|---|
 | 读题、拆分验收项、整理需求 | 确认题目边界和优先级 |
-| 对比参考设计，给出最小实现方案 | 决定保留/裁剪哪些能力 |
+| 对比几种常见 Agent 设计，给出最小实现方案 | 决定保留/裁剪哪些能力 |
 | 生成代码初版、测试用例、文档草稿 | 逐模块 review、修复边界、删过度设计 |
 | 以“面试官/攻击者”视角找风险 | 决定最终架构、取舍和验收标准 |
 | 生成 mock 数据、示例 trace | 检查是否泄露、是否符合题意 |
@@ -42,25 +42,25 @@
 | # | 时间 | 阶段 | 我给 AI 的 prompt（摘要） | AI 的建议 | 结论 | 理由 | 落地 |
 |---|---|---|---|---|---|---|---|
 | 1 | 10-25 | 读题 | 提取题目要求，按 vibe coding / 架构设计 / 交付物拆分 | 两部分；70 分门槛；5 模块选 1 | 采纳 | 作为计划输入 | `docs/REQUIREMENTS.md` |
-| 2 | 10-25 | 范围 | 对比参考实现，列出本题最小能力 | 保留 loop/tools/session/context/memory/trace；砍 MCP/多 Agent/skills/流式 | 部分采纳 | 保留骨架；压缩和 memory 重写为最小版 | `README.md` |
+| 2 | 10-25 | 范围 | 梳理常见 Agent 能力，列出本题最小能力 | 保留 loop/tools/session/context/memory/trace；砍 MCP/多 Agent/skills/流式 | 部分采纳 | 保留骨架；压缩和 memory 重写为最小版 | `README.md` |
 | 3 | 10-26 | 后端 | 只实现 Anthropic 还是同时做 OpenAI-compatible | 两套适配会翻倍工作量，先做一套 | 采纳 | 题目只要求真实 LLM API；Anthropic 原生 tool_use 更直接 | `llm/anthropic.py` |
 | 4 | 10-26 | P0 | 生成 loop / tools / session / context / memory / trace / CLI | 给出完整最小实现 | 部分采纳 | 核心代码逐行 review；删掉不必要的抽象 | `src/mini_agent/` |
 | 5 | 10-26 | 验证 | 跑单测 + 真实 API 冒烟 | 文本、todo 工具、memory 写入可通过 | 采纳 | 确认闭环可用 | `tests/`、`logs/` |
 | 6 | 10-27 | 路径安全 | `safe_id` 只防文件名穿越，是否足够 | 拆成 `safe_id`（标识符）+ `safe_path`（目录包含/符号链接） | 采纳 | 两者防不同问题；symlink 逃逸需要 resolve + containment | `util.py`、`session.py`、`memory.py`、`trace.py` |
 | 7 | 10-27 | Memory 存储 | JSON、Markdown 还是模型自己写记忆 | JSON canonical + 只读 Markdown 镜像 | 采纳 | 关键词召回不依赖格式；Markdown 主存储要 frontmatter/索引/一致性 | `memory.py` |
 | 8 | 10-27 | Memory 写入规则 | 自动抽取还是显式规则触发 | 只对“记住 / 以后都 / 我喜欢 / 我的…是”做高精度捕获 | 采纳 | 宁可少记，不要记错；自动抽取容易污染 | `memory.py` |
-| 9 | 10-27 | Memory 数据结构 | 参考 `MemoryEntry` 和我们的 `MemoryRecord` 是否要一致 | 按存储/写入路径差异做字段映射，不强行同构 | 采纳 | 参考是 Markdown 文件视图，我们是 JSON 记录；按需扩展 id/时间/置信度/status | `memory.py` |
-| 10 | 10-27 | Memory 接口 | 参考让模型写记忆，是否保留 | 加受限 `memory` 工具（save/search/list）+ `MemoryBackend` 协议；规则捕获兜底 | 采纳 | 保留模型自主权，避免暴露通用 `write_file` | `tools/memory.py`、`memory.py` |
-| 11 | 10-27 | Context | 压缩会替换 session 的 messages，旧原文会不会丢 | 压缩前归档到 `artifacts/transcripts/`；归档失败则不压缩 | 采纳 | 对齐参考的 `write_transcript`；session 保存压缩后的工作状态 | `context.py` |
-| 12 | 10-27 | Prompt / 工具提示词 | 工具 schema、静态 prompt、动态工具列表三处不一致，怎么收敛 | schema 只写“是什么”；静态 prompt 写“何时用”；删除 dynamic 重复列表 | 采纳 | 参考实现也是两层；避免三处漂移 | `prompt.py`、`tools/*.py` |
-| 13 | 10-28 | 运行时校验 | 参考的 `execute_tool` 没有运行时 schema 校验，要不要补 | 加 JSON Schema 子集校验；错误作为 `tool_result` 回给模型 | 采纳 | 模型参数可能错；集中校验比每个 handler 各自处理更一致 | `tools/executor.py` |
+| 9 | 10-27 | Memory 数据结构 | 记忆数据结构是否要和常见方案一致 | 按存储/写入路径差异做字段映射，不强行同构 | 采纳 | 常见方案是 Markdown 文件视图，我们是 JSON 记录；按需扩展 id/时间/置信度/status | `memory.py` |
+| 10 | 10-27 | Memory 接口 | 让模型参与写记忆，是否保留 | 加受限 `memory` 工具（save/search/list）+ `MemoryBackend` 协议；规则捕获兜底 | 采纳 | 保留模型自主权，避免暴露通用 `write_file` | `tools/memory.py`、`memory.py` |
+| 11 | 10-27 | Context | 压缩会替换 session 的 messages，旧原文会不会丢 | 压缩前归档到 `artifacts/transcripts/`；归档失败则不压缩 | 采纳 | 用 transcript 保留旧原文；session 保存压缩后的工作状态 | `context.py` |
+| 12 | 10-27 | Prompt / 工具提示词 | 工具 schema、静态 prompt、动态工具列表三处不一致，怎么收敛 | schema 只写“是什么”；静态 prompt 写“何时用”；删除 dynamic 重复列表 | 采纳 | schema 与使用策略分成两层；避免三处漂移 | `prompt.py`、`tools/*.py` |
+| 13 | 10-28 | 运行时校验 | 早期实现没有集中 schema 校验，要不要补 | 加 JSON Schema 子集校验；错误作为 `tool_result` 回给模型 | 采纳 | 模型参数可能错；集中校验比每个 handler 各自处理更一致 | `tools/executor.py` |
 | 14 | 10-28 | Trace | `llm_response` 重复记录 tool 参数、user_message 记全文，是否过多 | 删除重复参数；用户输入/记忆写入改为 chars + preview | 采纳 | 减少重复和 PII；完整参数仍在 `tool_call` 事件 | `loop.py` |
 | 15 | 10-28 | 落盘频率 | 一次带工具的 turn 写 3 次 session，是否过度 | 去掉 per-action save 和工具批次后的 save，只保留 turn 边界/压缩/错误 | 采纳 | 内存态足够下一轮模型调用；中途落盘不能安全恢复 | `loop.py`、`tools/todo.py` |
 | 16 | 10-29 | Thinking | 自定义 `<thought>` 标签 vs Anthropic 原生 thinking | 改为原生 `thinking` block；输出到 CLI；落盘前剥离；跨轮默认不回传 | 采纳 | 原生带签名/计费/协议语义；自定义标签不可信 | `protocol.py`、`llm/anthropic.py`、`session.py`、`loop.py` |
 | 17 | 10-29 | Thinking 输出 | 思考输出是否可选；跨轮是否回传 | `--show-thinking` / `--no-show-thinking`；同轮保留；跨轮默认剥离；`--keep-thinking-in-memory` 仅内存 | 采纳 | 输出可配；同轮保连续性；跨轮不污染上下文且永不落盘 | `cli.py`、`loop.py` |
 | 18 | 10-29 | 命名/调用 | `ToolRegistry` 名字体现不出执行职责；`ToolContext` 每个工具都重建 | 改 `ToolExecutor`；`ToolContext` 每轮构造一次复用 | 采纳 | 名字贴职责；减少无意义对象创建 | `tools/executor.py`、`loop.py` |
 | 19 | 10-29 | 配置 | 环境变量太分散，希望一个文件改所有设置 | 增加 `config.json` + `config.example.json`；CLI > config > env > defaults | 采纳 | 单文件可改；config.json 已 gitignore | `config.py`、`cli.py`、`llm/anthropic.py` |
-| 20 | 10-29 | 架构题 | 5 个模块各选 1 题，写在一个文件里 | 提供 M1-Q2 / M2-Q1 / M3-Q1 / M4-Q2 / M5-Q1 的提纲和取舍 | 采纳 | 用实现和边界做证据，不堆名词 | `docs/ARCH_ANSWERS.md` |
+| 20 | 10-29 | 架构题 | 5 个模块各选 1 题，用连续段落写在一个文件里，不分点 | 提供 M1-Q2 / M2-Q1 / M3-Q1 / M4-Q2 / M5-Q1 的取舍和边界 | 采纳 | 用实现和边界做证据，不堆名词 | `docs/ARCH_ANSWERS.md` |
 
 ---
 
@@ -103,7 +103,7 @@
 
 **现象**
 
-模型可能传错参数：缺必填、类型错、enum 非法、范围超限。参考实现主要靠 handler 自己 try/except。
+模型可能传错参数：缺必填、类型错、enum 非法、范围超限。早期实现主要靠 handler 自己 try/except。
 
 **方案**
 
@@ -226,7 +226,7 @@ artifacts/transcripts/<user>/<session>-<timestamp>.jsonl
 
 **为什么不做**
 
-- Markdown 主存储 + `MEMORY.md` 索引 + sideQuery 语义预取，代码量和不确定性都明显更高；
+- Markdown 主存储 + 索引 + 语义预取，代码量和不确定性都明显更高；
 - 本题要的是“能记住、能召回、能解释”，不是完整 memory OS。
 
 **验证**
@@ -347,7 +347,7 @@ artifacts/transcripts/<user>/<session>-<timestamp>.jsonl
 
 **结果**
 
-调用点更接近参考实现的简单形态，也少了一轮内重复对象创建。
+调用点更简单，也少了一轮内重复对象创建。
 
 ---
 
@@ -356,7 +356,7 @@ artifacts/transcripts/<user>/<session>-<timestamp>.jsonl
 | AI 建议 | 最终决定 | 理由 |
 |---|---|---|
 | 完整 4 档压缩（snip/micro/budget/summary） | 2 档：工具预算 + 旧轮摘要 + transcript | 本题说“基础压缩即可”；4 档代码和测试成本高，收益有限 |
-| Markdown 主存储 + `MEMORY.md` 索引 + sideQuery 召回 | JSON canonical + MD 镜像 + 关键词召回 + memory 工具 | 一周内可控；关键词召回不依赖文件格式；sideQuery 多一次调用且不确定 |
+| Markdown 主存储 + 索引 + 语义召回 | JSON canonical + MD 镜像 + 关键词召回 + memory 工具 | 一周内可控；关键词召回不依赖文件格式；语义召回多一次调用且不确定 |
 | 完整 6 种权限模式 + 规则文件 | 只做风险分级/路径校验/参数校验 | 本题没有 shell/任意写/网络/共享状态；完整权限系统是无风险收益的复杂度 |
 | thinking 跨轮持久化，保证推理连续 | 默认剥离；`--keep-thinking-in-memory` 仅内存 | 用户要求“不落盘”；持久化会带来成本、隐私、签名/版本问题 |
 | 保留自定义 `<thought>` 标签 | 改为原生 thinking block | 自定义标签无签名/无 API 语义，容易伪造 |
@@ -392,6 +392,6 @@ artifacts/transcripts/<user>/<session>-<timestamp>.jsonl
 - 原生 thinking 默认关闭；当前测试网关不保证支持 `thinking` 参数，官方 Anthropic 需实际验证；
 - 未做 200 轮长会话的真实压测；
 - 未做多进程并发写同一 session；
-- 未做完整 Markdown 主存储/sideQuery 召回；
+- 未做完整 Markdown 主存储/语义召回；
 - 未做完整权限模式和沙箱。
 

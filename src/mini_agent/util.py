@@ -47,7 +47,7 @@ def safe_id(value: str, kind: str) -> str:
 def safe_path(root: str | Path, relative: str | Path, kind: str = "path") -> Path:
     """Resolve relative under root and reject traversal / symlink escapes.
 
-    Mirrors the reference ``safe_path`` pattern from learn-claude-code/s02:
+    Uses the resolve + relative_to containment pattern:
 
         candidate = (root / relative).resolve()
         candidate.relative_to(root)   # ValueError if it escapes

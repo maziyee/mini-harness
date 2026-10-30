@@ -167,7 +167,7 @@ artifacts/                         # 被截断的完整工具结果
 - **放在哪**：system prompt 的独立小节 `## Long-term memory`，带类型和日期，并注明“可能过时，当前指令优先”。
 - **为什么**：记忆是背景，不是用户本轮指令；放 system 保持指令层级，带时间和来源便于纠错，限制 700 字符避免挤占当前任务。
 - **存储格式**：`memory/<user>.json` 是 canonical（结构化字段、单文件原子写、去重/冲突）；每次写入同时生成只读 `memory/<user>.md` 镜像，方便人读、`grep` 和 `git diff`。镜像不反向导入，避免“手改 MD 与 JSON 冲突”。
-- **为什么不用 MD 作为主存储**：关键词召回不依赖文件格式，JSON 的 `content` 同样可以分词/`grep`；MD 主存储需要 frontmatter 解析 + 索引重建 + 多文件一致性（参考 `learn-claude-code/s09` 的 ~757 行），对本题是过度设计。
+- **为什么不用 MD 作为主存储**：关键词召回不依赖文件格式，JSON 的 `content` 同样可以分词/`grep`；MD 主存储需要 frontmatter 解析 + 索引重建 + 多文件一致性，代码量和边界成本都更高，对本题是过度设计。
 
 ## Trace
 

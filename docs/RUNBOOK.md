@@ -83,7 +83,7 @@ CLI 参数 > config.json > 环境变量 / .env > 内置默认值
 仓库里已经有：
 
 - `config.json`：实际读取的配置，已 gitignore；
-- `config.example.json`：模板/参考。
+- `config.example.json`：配置模板。
 
 编辑 `config.json`：
 
@@ -371,7 +371,7 @@ python -m mini_agent --user test --session think-1 --no-show-thinking -p "..."
 
 ### 5.1 单元测试（推荐，不花钱）
 
-参考 `tests/test_loop.py` 的 `FakeLLM`：
+见 `tests/test_loop.py` 的 `FakeLLM`：
 
 ```python
 from helpers import FakeLLM, text_response, tool_response

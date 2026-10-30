@@ -118,8 +118,8 @@ class ContextManager:
     ) -> Path:
         """Write the raw messages that will be folded into the summary.
 
-        Mirrors learn-claude-code/s08's ``write_transcript``: compaction
-        should change the *working context*, not destroy the audit trail.
+        Compaction should change the *working context*, not destroy the
+        audit trail.
         """
         safe_id(session.user_id, "user")
         safe_id(session.id, "session")
